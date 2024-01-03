@@ -9,7 +9,7 @@ import ListItemText from "@mui/material/ListItemText";
 import EmailIcon from "@mui/icons-material/Email";
 import AddAlertIcon from "@mui/icons-material/AddAlert";
 import myList from "./data";
-import { Box } from "@mui/material";
+import Box from "@mui/system/Box";
 
 const drawerWidth = 240;
 
