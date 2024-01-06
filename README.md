@@ -12,10 +12,5 @@ AIzaSyATph3BCKxFTZucYVofwV2tuUIB-YXqHFg
 AIzaSyCh9gyBuLCyb3SIK-WIQKsCFNTBafQ87YE
 
 // You can add other options here as needed
-// zoomControl: false,
-// streetViewControl: false,
-// mapTypeControl: false,
-// fullscreenControl: false,
-// options={{
-//   mapTypeId: "satellite",
-// }}
+
+

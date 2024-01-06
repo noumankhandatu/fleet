@@ -8,7 +8,7 @@ const RouteStopStatic = () => {
         <b> Route Stops</b>
       </Typography>
       <Grid container spacing={4} sx={{ alignItems: "end" ,mt:4}}>
-        <Grid xs={1}></Grid>
+        <Grid xs={2}></Grid>
         <Grid xs={3}>
           <p>Destination*</p>
         </Grid>

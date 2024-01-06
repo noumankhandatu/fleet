@@ -11,7 +11,7 @@ const EndDestination = ({ duration, distance }, ref) => {
   return (
     <div>
       <Grid container spacing={4} sx={{ alignItems: "end" }}>
-        <Grid xs={1}>
+        <Grid style={{ textAlign: "center" }} xs={2}>
           <p>End*</p>
         </Grid>
         <Grid xs={3}>
@@ -42,11 +42,6 @@ const EndDestination = ({ duration, distance }, ref) => {
           <Box sx={styleBox}>
             <TextField variant="outlined" fullWidth label="Write a Note" />
           </Box>
-        </Grid>
-        <Grid xs={1}>
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
         </Grid>
       </Grid>
       <Box sx={{ textAlign: "center", mt: 3 }}>

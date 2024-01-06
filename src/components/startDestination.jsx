@@ -13,7 +13,9 @@ function StartDestination(props, ref) {
   return (
     <div>
       <Grid container spacing={4} sx={{ alignItems: "end" }}>
-        <Grid xs={1}>Start</Grid>
+        <Grid style={{ textAlign: "center" }} xs={2}>
+          Start
+        </Grid>
         <Grid xs={3}>
           <Box sx={styleBox}>
             <Autocomplete>
@@ -38,17 +40,15 @@ function StartDestination(props, ref) {
           </Box>
         </Grid>
         <Grid xs={1}>
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
+          <DeleteIcon color="error" />
         </Grid>
       </Grid>
-      <Box sx={{ textAlign: "center", mt: 3 }}>
+      {/* <Box sx={{ textAlign: "center", mt: 3 }}>
         <FormControlLabel
           control={<Checkbox sx={{ color: "red" }} />}
           label="Vehical is expected to already be this stop when the route begins. Uncheck this box to schedule and track arrival time"
         />
-      </Box>
+      </Box> */}
     </div>
   );
 }
