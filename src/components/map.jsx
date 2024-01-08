@@ -20,6 +20,7 @@ function AppMap() {
     libraries: ["places"],
   });
   const [stops, setStops] = useState([]);
+  const [stopMarkers, setStopMarkers] = useState([]);
   const [map, setMap] = useState(/** @type google.maps.Map */ (null));
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState("");
@@ -32,14 +33,23 @@ function AppMap() {
   const [getDestination, setDestinations] = useState();
 
   const addStop = () => {
-    setStops([...stops, { location: "", departureTime: "", note: "" }]);
+    const newStop = { location: "", departureTime: "", note: "" };
+    setStops([...stops, newStop]);
+
+    // Add a marker for the new stop
+    setStopMarkers([...stopMarkers, { label: stops.length + 1, position: null }]);
   };
 
   const removeStop = (index) => {
     const updatedStops = [...stops];
     updatedStops.splice(index, 1);
     setStops(updatedStops);
+
+    const updatedStopMarkers = [...stopMarkers];
+    updatedStopMarkers.splice(index, 1);
+    setStopMarkers(updatedStopMarkers);
   };
+
   async function calculateRoute() {
     if (originRef.current.value === "" || destinationRef.current.value === "") {
       return alert("Please enter locations");
@@ -76,6 +86,17 @@ function AppMap() {
     if (destinationCoordinates) {
       setDestinations(destinationCoordinates);
     }
+
+    // Set positions for stop markers
+    const updatedStopMarkers = stops.map((stop, index) => {
+      const position = {
+        lat: results.routes[0].legs[index].start_location.lat(),
+        lng: results.routes[0].legs[index].start_location.lng(),
+      };
+      return { label: index + 1, position };
+    });
+
+    setStopMarkers(updatedStopMarkers);
   }
 
   const clearRoute = () => {
@@ -85,6 +106,7 @@ function AppMap() {
     originRef.current.value = "";
     destinationRef.current.value = "";
     setStops([]);
+    setStopMarkers([]);
   };
 
   if (!isLoaded) {
@@ -96,6 +118,7 @@ function AppMap() {
       suppressMarkers: true,
     },
   };
+  console.log('Stop Markers:', stopMarkers);
   return (
     <div>
       {distance && distance}
@@ -169,6 +192,7 @@ function AppMap() {
         Add Another Stop
       </Button>
       <Box height="60px" />
+      {stopMarkers && stopMarkers.map((marker) => <div>hello</div>)}
 
       <Box sx={{ display: "flex", justifyContent: "end" }}>
         <Button onClick={clearRoute} variant="outlined" color="primary">
@@ -199,8 +223,12 @@ function AppMap() {
         mapContainerStyle={{ width: "100%", height: "500px" }}
         onLoad={(map) => setMap(map)}
       >
-        {getStartLocation && <NumberedMarker label={"1"} position={getStartLocation} />}
-        {getDestination && <NumberedMarker label={"2"} position={getDestination} />}
+        {getStartLocation && <NumberedMarker label={"A"} position={getStartLocation} />}
+        {stopMarkers &&
+          stopMarkers.map((marker) => (
+            <NumberedMarker key={marker.label} label={marker.label} position={marker.position} />
+          ))}
+        {getDestination && <NumberedMarker label={"B"} position={getDestination} />}
 
         {directionsResponse && (
           <DirectionsRenderer directions={directionsResponse} options={options} />
