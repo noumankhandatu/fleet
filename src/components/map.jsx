@@ -1,6 +1,4 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-undef */
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, TextField } from "@mui/material";
 import { useJsApiLoader, GoogleMap, DirectionsRenderer } from "@react-google-maps/api";
 import Box from "@mui/system/Box";
@@ -15,36 +13,22 @@ import { MarkerF } from "@react-google-maps/api";
 
 const center = { lat: 33.5651, lng: 73.0169 };
 const googleMapsLibraries = ["places"];
-
+const myApiKey = import.meta.env.VITE_MAP_KEY;
 function AppMap() {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_MAP_KEY,
+    googleMapsApiKey: myApiKey,
     libraries: googleMapsLibraries,
   });
   const [stops, setStops] = useState([]);
-  // eslint-disable-next-line no-unused-vars
-  const [map, setMap] = useState(/** @type google.maps.Map */ (null));
+  const [map, setMap] = useState(null);
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
   const originRef = useRef(null);
   const destinationRef = useRef(null);
-  // get lat lng states
-  const [getStartLocation, setStartLocation] = useState();
-  const [getDestination, setDestinations] = useState();
-  const [StopsCoordinates, setStopsCoordinates] = useState();
   const [autocomplete, setAutocomplete] = useState(null);
-
-  const addStop = () => {
-    const newStop = { location: "", departureTime: "", note: "" };
-    setStops([...stops, newStop]);
-  };
-
-  const removeStop = (index) => {
-    const updatedStops = [...stops];
-    updatedStops.splice(index, 1);
-    setStops(updatedStops);
-  };
+  const [routesPlaceId, setroutesPlaceId] = useState(null);
+  const [placeIdLocations, setplaceIdLocations] = useState();
 
   async function calculateRoute() {
     if (originRef.current.value === "" || destinationRef.current.value === "") {
@@ -62,33 +46,72 @@ function AppMap() {
       travelMode: google.maps.TravelMode.DRIVING,
       waypoints: waypoints,
     });
-    console.log(results, "results");
+
+    if (results.status === "OK" && results?.geocoded_waypoints) {
+      setroutesPlaceId(results?.geocoded_waypoints);
+    }
     setDirectionsResponse(results);
     setDistance(results.routes[0].legs[0].distance.text);
     setDuration(results.routes[0].legs[0].duration.text);
-    // Extract lat/lng for stops
-    const stopsCoordinates = stops.map((stop, index) => ({
-      lat: results.routes[0].legs[index].start_location.lat(),
-      lng: results.routes[0].legs[index].start_location.lng(),
-    }));
-    // Set the stopsCoordinates state
-    setStopsCoordinates(stopsCoordinates);
-    let originCoordinates = {
-      lat: results.routes[0].legs[0].start_location.lat(),
-      lng: results.routes[0].legs[0].start_location.lng(),
-    };
-    if (originCoordinates) {
-      setStartLocation(originCoordinates);
-    }
-    let destinationCoordinates = {
-      lat: results.routes[0].legs[0].end_location.lat(),
-      lng: results.routes[0].legs[0].end_location.lng(),
+  }
+
+  useEffect(() => {
+    const fetchPlaceDetails = async () => {
+      if (map && map !== null && routesPlaceId) {
+        console.log("map here");
+        const placesService = new window.google.maps.places.PlacesService(map);
+        const locationsWithDetails = await Promise.all(
+          routesPlaceId.map(async (place) => {
+            return new Promise((resolve, reject) => {
+              placesService.getDetails(
+                {
+                  placeId: place.place_id,
+                },
+                (result, status) => {
+                  if (status === "OK") {
+                    const location = {
+                      lat: result.geometry.location.lat(),
+                      lng: result.geometry.location.lng(),
+                    };
+                    resolve(location);
+                  } else {
+                    reject(status);
+                  }
+                }
+              );
+            });
+          })
+        );
+
+        if (locationsWithDetails) {
+          setplaceIdLocations(locationsWithDetails);
+        }
+      }
     };
 
-    if (destinationCoordinates) {
-      setDestinations(destinationCoordinates);
+    fetchPlaceDetails(); // Call the async function
+  }, [map, routesPlaceId]);
+
+  const handlePlaceChanged = (index) => {
+    if (autocomplete !== null) {
+      const place = autocomplete.getPlace();
+      const updatedStops = [...stops];
+      updatedStops[index].location = place.formatted_address;
+      updatedStops[index].place_id = place.place_id;
+      setStops(updatedStops);
     }
-  }
+  };
+
+  const addStop = () => {
+    const newStop = { location: "", departureTime: "", note: "" };
+    setStops([...stops, newStop]);
+  };
+
+  const removeStop = (index) => {
+    const updatedStops = [...stops];
+    updatedStops.splice(index, 1);
+    setStops(updatedStops);
+  };
 
   const clearRoute = () => {
     setDirectionsResponse(null);
@@ -99,24 +122,9 @@ function AppMap() {
     setStops([]);
   };
 
-  const handlePlaceChanged = (index) => {
-    if (autocomplete !== null) {
-      const place = autocomplete.getPlace();
-      const updatedStops = [...stops];
-      updatedStops[index].location = place.formatted_address;
-      setStops(updatedStops);
-    }
-  };
-
   if (!isLoaded) {
     return <div>Loading ... </div>;
   }
-
-  const options = {
-    markerOptions: {
-      suppressMarkers: true,
-    },
-  };
 
   return (
     <div>
@@ -215,14 +223,18 @@ function AppMap() {
         mapContainerStyle={{ width: "100%", height: "500px" }}
         onLoad={(map) => setMap(map)}
       >
-        {[getStartLocation, getDestination].map((items, id) => {
-          <NumberedMarker label={"test"} position={items} />;
-        })}
+        {placeIdLocations &&
+          placeIdLocations.map((location, index) => (
+            <MarkerF key={index} icon={customMarkerIcon(`${index + 1}`, 20)} position={location} />
+          ))}
+
         {directionsResponse && (
           <DirectionsRenderer
-            suppressMarkers={true}
+            options={{
+              suppressMarkers: true,
+              suppressInfoWindow: true,
+            }}
             directions={directionsResponse}
-            options={options}
           />
         )}
       </GoogleMap>
@@ -233,10 +245,7 @@ function AppMap() {
 export default AppMap;
 const styleBox = { mt: 2, display: "flex", alignItems: "center", gap: 1 };
 
-const NumberedMarker = ({ label, position }) => {
-  return <MarkerF icon={customMarkerIcon(label, 20)} position={position} />;
-};
 const customMarkerIcon = (label) => ({
   url: `https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=${label}|FF776B|000000`,
-  scaledSize: new window.google.maps.Size(40, 60), // Adjust size as needed
+  scaledSize: new window.google.maps.Size(40, 60),
 });
