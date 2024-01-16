@@ -14,11 +14,12 @@ import { IconButton } from "@mui/material";
 import { MarkerF } from "@react-google-maps/api";
 
 const center = { lat: 33.5651, lng: 73.0169 };
+const googleMapsLibraries = ["places"];
 
 function AppMap() {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_MAP_KEY,
-    libraries: ["places"],
+    libraries: googleMapsLibraries,
   });
   const [stops, setStops] = useState([]);
   // eslint-disable-next-line no-unused-vars
@@ -32,6 +33,8 @@ function AppMap() {
   const [getStartLocation, setStartLocation] = useState();
   const [getDestination, setDestinations] = useState();
   const [StopsCoordinates, setStopsCoordinates] = useState();
+  const [autocomplete, setAutocomplete] = useState(null);
+
   const addStop = () => {
     const newStop = { location: "", departureTime: "", note: "" };
     setStops([...stops, newStop]);
@@ -96,6 +99,15 @@ function AppMap() {
     setStops([]);
   };
 
+  const handlePlaceChanged = (index) => {
+    if (autocomplete !== null) {
+      const place = autocomplete.getPlace();
+      const updatedStops = [...stops];
+      updatedStops[index].location = place.formatted_address;
+      setStops(updatedStops);
+    }
+  };
+
   if (!isLoaded) {
     return <div>Loading ... </div>;
   }
@@ -124,7 +136,10 @@ function AppMap() {
             </Grid>
             <Grid xs={3}>
               <Box sx={styleBox}>
-                <Autocomplete>
+                <Autocomplete
+                  onLoad={(auto) => setAutocomplete(auto)}
+                  onPlaceChanged={() => handlePlaceChanged(index)}
+                >
                   <TextField
                     label={`Stop ${index + 1} Location`}
                     value={stop.location}
