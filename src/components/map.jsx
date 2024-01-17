@@ -186,7 +186,6 @@ const AppMap = () => {
                   </Box>
                 </Grid>
                 <Grid xs={3}>
-                  {" "}
                   <Box sx={styleBox}>
                     <TextField
                       label={`Stop ${index + 1} Note`}
@@ -196,7 +195,7 @@ const AppMap = () => {
                         updatedStops[index].note = e.target.value;
                         setStops(updatedStops);
                       }}
-                    />{" "}
+                    />
                   </Box>
                 </Grid>
                 <Grid xs={1}>
@@ -238,11 +237,6 @@ const AppMap = () => {
               style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
               position: window.google.maps.ControlPosition.TOP_RIGHT,
             },
-            labels: true,
-            zoomControl: true,
-            streetViewControl: true,
-            mapTypeControl: true,
-            fullscreenControl: true,
           }}
           mapContainerStyle={{ width: "100%", height: "500px" }}
           onLoad={(map) => setMap(map)}

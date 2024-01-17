@@ -9,7 +9,7 @@ export const directionOptions = {
 
 export const customMarkerIcon = (label) => ({
   url: `https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=${label}|FF776B|000000`,
-  scaledSize: new window.google.maps.Size(40, 60),
+  scaledSize: new window.google.maps.Size(30, 50),
 });
 
 // style
