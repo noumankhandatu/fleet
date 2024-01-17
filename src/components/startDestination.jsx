@@ -4,7 +4,6 @@ import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/system/Box";
 import { Autocomplete } from "@react-google-maps/api";
-import FlagIcon from "@mui/icons-material/Flag";
 function StartDestination(props, ref) {
   const currentDate = new Date();
   const currentTime = currentDate.toLocaleTimeString();
@@ -37,9 +36,6 @@ function StartDestination(props, ref) {
           <Box sx={styleBox}>
             <TextField variant="outlined" fullWidth label="Write a Note" />
           </Box>
-        </Grid>
-        <Grid>
-          <FlagIcon color="success" />
         </Grid>
       </Grid>
       {/* <Box sx={{ textAlign: "center", mt: 3 }}>

@@ -17,7 +17,6 @@ import {
   directionOptions,
   googleMapsLibraries,
   myApiKey,
-  options,
   styleBox,
 } from "./utils";
 
@@ -64,7 +63,6 @@ const AppMap = () => {
             });
           })
         );
-
         if (locationsWithDetails) {
           setPlaceIdLocations(locationsWithDetails);
         }
@@ -141,103 +139,128 @@ const AppMap = () => {
     return <div>Loading ... </div>;
   }
   return (
-    <div>
-      <Box height="20px" />
-      <RouteStopStatic />
-      <Box height="20px" />
-      <StartDestination ref={originRef} />
-      <Box height="20px" />
-      {/* Stops Started */}
-      {stops.map((stop, index) => {
-        return (
-          <div key={index}>
-            <Grid container spacing={4} sx={{ alignItems: "end" }}>
-              <Grid style={{ textAlign: "center" }} xs={2}>
-                Stop {index + 1}
-              </Grid>
-              <Grid xs={3}>
-                <Box sx={styleBox}>
-                  <Autocomplete
-                    onLoad={(auto) => setAutocomplete(auto)}
-                    onPlaceChanged={() => handlePlaceChanged(index)}
-                  >
+    <div style={{ display: "flex", width: "100%", gap: 40 }}>
+      <div style={{ width: "90%", height: "100px" }}>
+        <Box height="20px" />
+        <RouteStopStatic />
+        <Box height="20px" />
+        <StartDestination ref={originRef} />
+        <Box height="20px" />
+        {/* Stops Started */}
+        {stops.map((stop, index) => {
+          return (
+            <div key={index}>
+              <Grid container spacing={4} sx={{ alignItems: "end" }}>
+                <Grid style={{ textAlign: "center" }} xs={2}>
+                  Stop {index + 1}
+                </Grid>
+                <Grid xs={3}>
+                  <Box sx={styleBox}>
+                    <Autocomplete
+                      onLoad={(auto) => setAutocomplete(auto)}
+                      onPlaceChanged={() => handlePlaceChanged(index)}
+                    >
+                      <TextField
+                        label={`Stop ${index + 1} Location`}
+                        value={stop.location}
+                        onChange={(e) => {
+                          const updatedStops = [...stops];
+                          updatedStops[index].location = e.target.value;
+                          setStops(updatedStops);
+                        }}
+                      />
+                    </Autocomplete>
+                  </Box>
+                </Grid>
+                <Grid xs={3}>
+                  <Box sx={styleBox}>
                     <TextField
-                      label={`Stop ${index + 1} Location`}
-                      value={stop.location}
+                      label={`Stop ${index + 1} Departure Time`}
+                      value={stop.departureTime}
                       onChange={(e) => {
                         const updatedStops = [...stops];
-                        updatedStops[index].location = e.target.value;
+                        updatedStops[index].departureTime = e.target.value;
                         setStops(updatedStops);
                       }}
                     />
-                  </Autocomplete>
-                </Box>
+                  </Box>
+                </Grid>
+                <Grid xs={3}>
+                  {" "}
+                  <Box sx={styleBox}>
+                    <TextField
+                      label={`Stop ${index + 1} Note`}
+                      value={stop.note}
+                      onChange={(e) => {
+                        const updatedStops = [...stops];
+                        updatedStops[index].note = e.target.value;
+                        setStops(updatedStops);
+                      }}
+                    />{" "}
+                  </Box>
+                </Grid>
+                <Grid xs={1}>
+                  <IconButton onClick={() => removeStop(index, stop?.place_id)}>
+                    <DeleteIcon color="error" />
+                  </IconButton>
+                </Grid>
               </Grid>
-              <Grid xs={3}>
-                <Box sx={styleBox}>
-                  <TextField
-                    label={`Stop ${index + 1} Departure Time`}
-                    value={stop.departureTime}
-                    onChange={(e) => {
-                      const updatedStops = [...stops];
-                      updatedStops[index].departureTime = e.target.value;
-                      setStops(updatedStops);
-                    }}
-                  />
-                </Box>
-              </Grid>
-              <Grid xs={3}>
-                {" "}
-                <Box sx={styleBox}>
-                  <TextField
-                    label={`Stop ${index + 1} Note`}
-                    value={stop.note}
-                    onChange={(e) => {
-                      const updatedStops = [...stops];
-                      updatedStops[index].note = e.target.value;
-                      setStops(updatedStops);
-                    }}
-                  />{" "}
-                </Box>
-              </Grid>
-              <Grid xs={1}>
-                <IconButton onClick={() => removeStop(index, stop?.place_id)}>
-                  <DeleteIcon color="error" />
-                </IconButton>
-              </Grid>
-            </Grid>
-          </div>
-        );
-      })}
-      {/* End filed started */}
-      <EndDestination ref={destinationRef} duration={duration} distance={distance} />
-      <Button onClick={addStop} color="warning" fullWidth variant="contained" sx={{ mt: 6, mb: 6 }}>
-        Add Another Stop
-      </Button>
-      <Box sx={{ display: "flex", justifyContent: "end", mb: 10 }}>
-        <Button onClick={clearRoute} variant="outlined" color="primary">
-          Cancel
+            </div>
+          );
+        })}
+        {/* End filed started */}
+        <EndDestination ref={destinationRef} duration={duration} distance={distance} />
+        <Button
+          onClick={addStop}
+          color="warning"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 6, mb: 6 }}
+        >
+          Add Another Stop
         </Button>
-        <Button onClick={calculateRoute} sx={{ ml: 1 }} variant="contained" color="primary">
-          Create Route
-        </Button>
-      </Box>
-      <GoogleMap
-        center={center}
-        zoom={15}
-        options={options}
-        mapContainerStyle={{ width: "100%", height: "500px" }}
-        onLoad={(map) => setMap(map)}
-      >
-        {placeIdLocations &&
-          placeIdLocations.map((location, index) => (
-            <MarkerF key={index} icon={customMarkerIcon(`${index + 1}`, 20)} position={location} />
-          ))}
+        <Box sx={{ display: "flex", justifyContent: "end", mb: 10 }}>
+          <Button onClick={clearRoute} variant="outlined" color="primary">
+            Cancel
+          </Button>
+          <Button onClick={calculateRoute} sx={{ ml: 1 }} variant="contained" color="primary">
+            Create Route
+          </Button>
+        </Box>
+      </div>
+      <div style={{ width: "90%", height: "100vh" }}>
+        <GoogleMap
+          center={center}
+          zoom={15}
+          options={{
+            mapTypeId: window.google.maps.MapTypeId.HYBRID,
+            mapTypeControlOptions: {
+              style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+              position: window.google.maps.ControlPosition.TOP_RIGHT,
+            },
+            labels: true,
+            zoomControl: true,
+            streetViewControl: true,
+            mapTypeControl: true,
+            fullscreenControl: true,
+          }}
+          mapContainerStyle={{ width: "100%", height: "500px" }}
+          onLoad={(map) => setMap(map)}
+        >
+          {placeIdLocations &&
+            placeIdLocations.map((location, index) => (
+              <MarkerF
+                key={index}
+                icon={customMarkerIcon(`${index + 1}`, 20)}
+                position={location}
+              />
+            ))}
 
-        {directionsResponse && (
-          <DirectionsRenderer options={directionOptions} directions={directionsResponse} />
-        )}
-      </GoogleMap>
+          {directionsResponse && (
+            <DirectionsRenderer options={directionOptions} directions={directionsResponse} />
+          )}
+        </GoogleMap>
+      </div>
     </div>
   );
 };

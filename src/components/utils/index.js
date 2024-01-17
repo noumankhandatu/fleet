@@ -1,12 +1,7 @@
 export const center = { lat: 33.5651, lng: 73.0169 };
 export const googleMapsLibraries = ["places"];
 export const myApiKey = import.meta.env.VITE_MAP_KEY;
-export const options = {
-  zoomControl: true,
-  streetViewControl: true,
-  mapTypeControl: true,
-  fullscreenControl: true,
-};
+
 export const directionOptions = {
   suppressMarkers: true,
   suppressInfoWindow: true,
