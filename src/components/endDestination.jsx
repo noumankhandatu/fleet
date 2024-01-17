@@ -1,18 +1,18 @@
 /* eslint-disable react/prop-types */
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import TextField from "@mui/material/TextField";
-import { Checkbox, FormControlLabel, IconButton } from "@mui/material";
+import { Checkbox, FormControlLabel } from "@mui/material";
 import Box from "@mui/system/Box";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { Autocomplete } from "@react-google-maps/api";
 import { forwardRef } from "react";
 
+// eslint-disable-next-line react-refresh/only-export-components
 const EndDestination = ({ duration, distance }, ref) => {
   return (
     <div>
       <Grid container spacing={4} sx={{ alignItems: "end" }}>
         <Grid style={{ textAlign: "center" }} xs={2}>
-          <p>End*</p>
+          <p>End</p>
         </Grid>
         <Grid xs={3}>
           <Box sx={styleBox}>
