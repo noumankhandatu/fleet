@@ -6,6 +6,6 @@ path to destination
 divide paths to points
 
 
-// You can add other options here as needed
+
 
 
