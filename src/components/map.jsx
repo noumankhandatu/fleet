@@ -11,14 +11,7 @@ import { Autocomplete } from "@react-google-maps/api";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton } from "@mui/material";
 import { MarkerF } from "@react-google-maps/api";
-import {
-  center,
-  customMarkerIcon,
-  directionOptions,
-  googleMapsLibraries,
-  myApiKey,
-  styleBox,
-} from "./utils";
+import { center, directionOptions, googleMapsLibraries, myApiKey, styleBox } from "./utils";
 
 const AppMap = () => {
   const { isLoaded } = useJsApiLoader({
@@ -36,7 +29,7 @@ const AppMap = () => {
   const [autocomplete, setAutocomplete] = useState(null);
   const [routesPlaceId, setRoutesPlaceId] = useState(null);
   const [placeIdLocations, setPlaceIdLocations] = useState();
-
+  const [callCalulate, setCallCalulate] = useState(false);
   useEffect(() => {
     const fetchPlaceDetails = async () => {
       if (map && map !== null && routesPlaceId) {
@@ -73,6 +66,10 @@ const AppMap = () => {
   }, [map, routesPlaceId, stops]);
 
   const calculateRoute = async () => {
+    setDirectionsResponse(null);
+    setDistance("");
+    setDuration("");
+    setPlaceIdLocations([]);
     if (originRef.current.value === "" || destinationRef.current.value === "") {
       return alert("Please enter locations");
     }
@@ -118,14 +115,22 @@ const AppMap = () => {
     const updatedStops = [...stops];
     updatedStops.splice(index, 1);
     setStops(updatedStops);
-    const myNewLocatitons = routesPlaceId.filter((ele) => {
-      return ele.place_id !== removeLocationId;
-    });
-    if (myNewLocatitons) {
-      setRoutesPlaceId(myNewLocatitons);
+
+    const myNewLocations =
+      routesPlaceId &&
+      routesPlaceId.filter((ele) => {
+        return ele.place_id !== removeLocationId;
+      });
+
+    if (myNewLocations) {
+      setRoutesPlaceId(myNewLocations);
+      setCallCalulate(true);
     }
   };
-
+  if (callCalulate) {
+    calculateRoute();
+    setCallCalulate(false);
+  }
   const clearRoute = () => {
     setDirectionsResponse(null);
     setDistance("");
@@ -242,14 +247,15 @@ const AppMap = () => {
           onLoad={(map) => setMap(map)}
         >
           {placeIdLocations &&
-            placeIdLocations.map((location, index) => (
-              <MarkerF
-                key={index}
-                icon={customMarkerIcon(`${index + 1}`, 20)}
-                position={location}
-              />
-            ))}
-
+            placeIdLocations.map((location, index) => {
+              return (
+                <MarkerF
+                  key={index}
+                  icon={customMarkerIcon(placeIdLocations, location, index)}
+                  position={location}
+                />
+              );
+            })}
           {directionsResponse && (
             <DirectionsRenderer options={directionOptions} directions={directionsResponse} />
           )}
@@ -260,3 +266,20 @@ const AppMap = () => {
 };
 
 export default AppMap;
+const customMarkerIcon = (placeIdLocations, location, index) => {
+  let lable = "";
+  if (location.lat === placeIdLocations[0].lat && location.lng === placeIdLocations[0].lng) {
+    lable = "S";
+  } else if (
+    location.lat === placeIdLocations[placeIdLocations.length - 1].lat &&
+    location.lng === placeIdLocations[placeIdLocations.length - 1].lng
+  ) {
+    lable = "E";
+  } else {
+    lable = index;
+  }
+  return {
+    url: `https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=${lable}|FF0000|000000`,
+    size: new window.google.maps.Size(40, 40),
+  };
+};
