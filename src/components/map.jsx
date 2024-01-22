@@ -11,16 +11,10 @@ import { Autocomplete } from "@react-google-maps/api";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton } from "@mui/material";
 import { MarkerF } from "@react-google-maps/api";
-import {
-  center,
-  customMarkerIcon,
-  directionOptions,
-  googleMapsLibraries,
-  myApiKey,
-  styleBox,
-} from "./utils";
+import { center, directionOptions, googleMapsLibraries, myApiKey, styleBox } from "./utils";
 import { toast } from "react-toastify";
 
+let lable = "";
 let colorOne = "FF0000";
 let colorTwo = "ADD8E6";
 
@@ -313,3 +307,25 @@ const AppMap = () => {
 };
 
 export default AppMap;
+
+const customMarkerIcon = (placeIdLocations, location, index, color) => {
+  if (
+    index === 0 &&
+    location.lat === placeIdLocations[0].lat &&
+    location.lng === placeIdLocations[0].lng
+  ) {
+    lable = "S";
+  } else if (
+    index === placeIdLocations.length - 1 &&
+    location.lat === placeIdLocations[placeIdLocations.length - 1].lat &&
+    location.lng === placeIdLocations[placeIdLocations.length - 1].lng
+  ) {
+    lable = "E";
+  } else {
+    lable = index;
+  }
+  return {
+    url: `https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=${lable}|${color}|000000`,
+    scaledSize: new window.google.maps.Size(30, 50),
+  };
+};
