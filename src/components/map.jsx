@@ -277,13 +277,19 @@ const AppMap = () => {
           {placeIdLocations &&
             placeIdLocations.map((location, index) => {
               const key = `${index}-${location.lat}-${location.lng}`;
+              const randomOffset = (Math.random() - 0.5) * 0.0001; // Small random value
+              const adjustedPosition = {
+                lat: location.lat + randomOffset,
+                lng: location.lng + randomOffset,
+              };
+
               return (
                 <>
                   {index === clickedMarkerIndex && (
                     <MarkerF
                       key={key + "-1"}
                       icon={customMarkerIcon(placeIdLocations, location, index, colorTwo)}
-                      position={location}
+                      position={adjustedPosition}
                       onClick={() => handleMarkerClick(index)}
                     />
                   )}
@@ -291,7 +297,7 @@ const AppMap = () => {
                   <MarkerF
                     key={key + "-2"}
                     icon={customMarkerIcon(placeIdLocations, location, index, colorOne)}
-                    position={location}
+                    position={adjustedPosition}
                     onClick={() => handleMarkerClick(index)}
                   />
                 </>
