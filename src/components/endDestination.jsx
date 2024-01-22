@@ -54,5 +54,6 @@ const EndDestination = ({ duration, distance }, ref) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export default forwardRef(EndDestination);
 const styleBox = { mt: 2, display: "flex", alignItems: "center", gap: 1 };

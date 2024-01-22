@@ -80,12 +80,17 @@ const AppMap = () => {
     }));
 
     const directionsService = new google.maps.DirectionsService();
-    const results = await directionsService.route({
-      origin: originRef.current.value,
-      destination: destinationRef.current.value,
-      travelMode: google.maps.TravelMode.DRIVING,
-      waypoints: waypoints,
-    });
+    const results = await directionsService
+      .route({
+        origin: originRef.current.value,
+        destination: destinationRef.current.value,
+        travelMode: google.maps.TravelMode.DRIVING,
+        waypoints: waypoints,
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("the location are outdated in google map please write a near location");
+      });
 
     if (results.status === "OK" && results?.geocoded_waypoints) {
       setRoutesPlaceId(results?.geocoded_waypoints);
@@ -97,10 +102,9 @@ const AppMap = () => {
   };
 
   const handlePlaceChanged = (index) => {
-    if (autocomplete !== null) {
+    if (autocomplete !== null && autocomplete.getPlace()) {
       const place = autocomplete.getPlace();
       const updatedStops = [...stops];
-      console.log(updatedStops, "updatedStops");
       updatedStops[index].location = place.formatted_address;
       updatedStops[index].place_id = place.place_id;
       setStops(updatedStops);
@@ -280,6 +284,6 @@ const customMarkerIcon = (placeIdLocations, location, index) => {
   }
   return {
     url: `https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=${lable}|FF0000|000000`,
-    size: new window.google.maps.Size(40, 40),
+    scaledSize: new window.google.maps.Size(30, 50),
   };
 };
