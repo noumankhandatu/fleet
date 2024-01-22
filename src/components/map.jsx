@@ -12,6 +12,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton } from "@mui/material";
 import { MarkerF } from "@react-google-maps/api";
 import { center, directionOptions, googleMapsLibraries, myApiKey, styleBox } from "./utils";
+import { toast } from "react-toastify";
+
+let lable = "";
+
+let colorOne = "FF0000";
+let colorTwo = "ADD8E6";
 
 const AppMap = () => {
   const { isLoaded } = useJsApiLoader({
@@ -30,6 +36,8 @@ const AppMap = () => {
   const [routesPlaceId, setRoutesPlaceId] = useState(null);
   const [placeIdLocations, setPlaceIdLocations] = useState();
   const [callCalulate, setCallCalulate] = useState(false);
+  const [clickedMarkerIndex, setClickedMarkerIndex] = useState(null);
+
   useEffect(() => {
     const fetchPlaceDetails = async () => {
       if (map && map !== null && routesPlaceId) {
@@ -71,7 +79,7 @@ const AppMap = () => {
     setDuration("");
     setPlaceIdLocations([]);
     if (originRef.current.value === "" || destinationRef.current.value === "") {
-      return alert("Please enter locations");
+      return toast.error("Please enter locations");
     }
 
     const waypoints = stops.map((stop) => ({
@@ -147,8 +155,25 @@ const AppMap = () => {
   if (!isLoaded) {
     return <div>Loading ... </div>;
   }
+  const handleMarkerClick = (index) => {
+    if (clickedMarkerIndex !== null) {
+      // Swap the routes
+      const updatedPlaceIdLocations = [...placeIdLocations];
+      const temp = updatedPlaceIdLocations[index];
+      updatedPlaceIdLocations[index] = updatedPlaceIdLocations[clickedMarkerIndex];
+      updatedPlaceIdLocations[clickedMarkerIndex] = temp;
+
+      setPlaceIdLocations(updatedPlaceIdLocations);
+      setClickedMarkerIndex(null);
+
+      // Show toast message for route swap
+      toast.success(`Swapped routes`);
+    } else {
+      setClickedMarkerIndex(index);
+    }
+  };
   return (
-    <div style={{ display: "flex", width: "100%", gap: 40 }}>
+    <div key={3} style={{ display: "flex", width: "100%", gap: 40 }}>
       <div style={{ width: "90%", height: "100px" }}>
         <Box height="20px" />
         <RouteStopStatic />
@@ -159,7 +184,7 @@ const AppMap = () => {
         {stops.map((stop, index) => {
           return (
             <div key={index}>
-              <Grid container spacing={4} sx={{ alignItems: "end" }}>
+              <Grid key={index} container spacing={4} sx={{ alignItems: "end" }}>
                 <Grid style={{ textAlign: "center" }} xs={2}>
                   Stop {index + 1}
                 </Grid>
@@ -252,12 +277,25 @@ const AppMap = () => {
         >
           {placeIdLocations &&
             placeIdLocations.map((location, index) => {
+              const key = `${index}-${location.lat}-${location.lng}`;
               return (
-                <MarkerF
-                  key={index}
-                  icon={customMarkerIcon(placeIdLocations, location, index)}
-                  position={location}
-                />
+                <>
+                  {index === clickedMarkerIndex && (
+                    <MarkerF
+                      key={key + "-1"}
+                      icon={customMarkerIcon(placeIdLocations, location, index, colorTwo)}
+                      position={location}
+                      onClick={() => handleMarkerClick(index)}
+                    />
+                  )}
+
+                  <MarkerF
+                    key={key + "-2"}
+                    icon={customMarkerIcon(placeIdLocations, location, index, colorOne)}
+                    position={location}
+                    onClick={() => handleMarkerClick(index)}
+                  />
+                </>
               );
             })}
           {directionsResponse && (
@@ -270,8 +308,8 @@ const AppMap = () => {
 };
 
 export default AppMap;
-const customMarkerIcon = (placeIdLocations, location, index) => {
-  let lable = "";
+
+const customMarkerIcon = (placeIdLocations, location, index, color) => {
   if (location.lat === placeIdLocations[0].lat && location.lng === placeIdLocations[0].lng) {
     lable = "S";
   } else if (
@@ -283,7 +321,7 @@ const customMarkerIcon = (placeIdLocations, location, index) => {
     lable = index;
   }
   return {
-    url: `https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=${lable}|FF0000|000000`,
+    url: `https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=${lable}|${color}|000000`,
     scaledSize: new window.google.maps.Size(30, 50),
   };
 };
