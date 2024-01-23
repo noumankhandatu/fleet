@@ -10,10 +10,23 @@ import EmailIcon from "@mui/icons-material/Email";
 import AddAlertIcon from "@mui/icons-material/AddAlert";
 import myList from "./data";
 import Box from "@mui/system/Box";
+import Settings from "@mui/icons-material/Settings";
+import Logout from "@mui/icons-material/Logout";
+import { clearToken } from "../toolkit/authSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const drawerWidth = 240;
 
 const AppDrawer = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    dispatch(clearToken());
+    toast.success("Logged out successfully");
+    navigate("/");
+  };
   return (
     <div>
       <Drawer
@@ -49,7 +62,6 @@ const AppDrawer = () => {
               />
 
               <Typography variant="h5" sx={{ ml: 2 }}>
-                {" "}
                 Fleat
               </Typography>
             </Box>
@@ -75,7 +87,20 @@ const AppDrawer = () => {
                 );
               })}
           </List>
-
+          <div style={{ position: "absolute", bottom: 10 }}>
+            <ListItem>
+              <ListItemIcon>
+                <Settings fontSize="small" />
+              </ListItemIcon>
+              Settings
+            </ListItem>
+            <ListItem onClick={handleLogout}>
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
+              Logout
+            </ListItem>
+          </div>
           <Divider />
         </Box>
       </Drawer>
