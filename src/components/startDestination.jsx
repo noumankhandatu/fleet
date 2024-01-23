@@ -10,18 +10,16 @@ function StartDestination(props, ref) {
   const currentDateFormatted = currentDate.toLocaleDateString();
   return (
     <div>
-      <Grid container spacing={4} sx={{ alignItems: "end" }}>
-        <Grid style={{ textAlign: "center" }} xs={2}>
-          Start
-        </Grid>
-        <Grid xs={3}>
+      <Grid container spacing={4}>
+        <Grid xs={4}>
           <Box sx={styleBox}>
+            <p style={{ marginRight: 10 }}>Start</p>
             <Autocomplete>
               <TextField inputRef={ref} label="Add Start Location" />
             </Autocomplete>
           </Box>
         </Grid>
-        <Grid xs={3}>
+        <Grid xs={4}>
           <Box sx={styleBox}>
             <TextField
               variant="outlined"

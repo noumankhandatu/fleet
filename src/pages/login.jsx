@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { setToken } from "../toolkit/authSlice";
+import { setToken } from "../toolkit/slices/authSlice";
 
 export default function LoginPage() {
   const navigate = useNavigate();

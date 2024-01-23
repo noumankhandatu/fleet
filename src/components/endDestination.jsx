@@ -10,12 +10,10 @@ import { forwardRef } from "react";
 const EndDestination = ({ duration, distance }, ref) => {
   return (
     <div>
-      <Grid container spacing={4} sx={{ alignItems: "end" }}>
-        <Grid style={{ textAlign: "center" }} xs={2}>
-          <p>End</p>
-        </Grid>
-        <Grid xs={3}>
+      <Grid container spacing={4}>
+        <Grid xs={4}>
           <Box sx={styleBox}>
+            <p style={{ marginRight: 20 }}>End</p>
             <Autocomplete>
               <TextField inputRef={ref} label="Add Stop Location" />
             </Autocomplete>
@@ -38,7 +36,6 @@ const EndDestination = ({ duration, distance }, ref) => {
           </Box>
         </Grid>
         <Grid xs={3}>
-          {" "}
           <Box sx={styleBox}>
             <TextField variant="outlined" fullWidth label="Write a Note" />
           </Box>

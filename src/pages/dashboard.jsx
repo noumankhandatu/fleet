@@ -5,8 +5,13 @@ import { Button } from "@mui/material";
 import AppMap from "./../components/map";
 import AppDrawer from "./../components/drawer";
 import SearchableSelect from "../components/atom/SearchSelect";
+import SearchOrderNumber from "../components/atom/SearchOrderNo";
+import { useSelector } from "react-redux";
+import { selectDriverOrderId } from "../toolkit/slices/DriverOrderId";
 
 const Dashboard = () => {
+  const Id = useSelector(selectDriverOrderId);
+
   return (
     <div>
       <Box sx={{ display: "flex" }}>
@@ -33,13 +38,15 @@ const Dashboard = () => {
                 justifyContent: "space-between",
               }}
             >
-                <Button variant="contained" color="primary">
+              <Button variant="contained" color="primary">
                 Create Route
               </Button>
             </Box>
           </Box>
           <Box height="20px" />
           <SearchableSelect />
+          <Box height="20px" />
+          {Id && <SearchOrderNumber />}
           <Box height="40px" />
           <AppMap />
         </Box>

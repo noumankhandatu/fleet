@@ -12,10 +12,10 @@ import myList from "./data";
 import Box from "@mui/system/Box";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
-import { clearToken } from "../toolkit/authSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { clearToken } from "../toolkit/slices/authSlice";
 
 const drawerWidth = 240;
 
@@ -56,7 +56,7 @@ const AppDrawer = () => {
               }}
             >
               <img
-                style={{ width: "32px" }}
+                style={{ width: "42px" }}
                 src="https://upload.wikimedia.org/wikipedia/commons/1/15/Fleet_Aircraft_logo.jpg"
                 alt=""
               />
@@ -67,8 +67,8 @@ const AppDrawer = () => {
             </Box>
 
             <div>
-              <AddAlertIcon sx={{ mr: 1 }} />
-              <EmailIcon />
+              <AddAlertIcon fontSize="small" sx={{ mr: 1 }} />
+              <EmailIcon fontSize="small" />
             </div>
           </Box>
           <List sx={{ mt: 4 }}>

@@ -260,7 +260,7 @@ const AppMap = () => {
           </Button>
         </Box>
       </div>
-      <div style={{ width: "90%", height: "100vh" }}>
+      <div style={{ width: "70%", height: "100vh" }}>
         <GoogleMap
           center={center}
           zoom={15}

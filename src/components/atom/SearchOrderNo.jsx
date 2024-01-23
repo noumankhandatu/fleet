@@ -2,25 +2,23 @@ import { useState, useEffect } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { setDriverOrderId } from "../../toolkit/slices/DriverOrderId";
+import { useSelector } from "react-redux";
+import { selectDriverOrderId } from "../../toolkit/slices/DriverOrderId";
 
-const SearchableSelect = () => {
+const SearchOrderNumber = () => {
   const [value, setValue] = useState(null);
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const authToken = useSelector((state) => state.auth.token);
-
-  // hooks
-  const dispatch = useDispatch();
-
+  const DriverOrderId = useSelector(selectDriverOrderId);
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://portal.reliabletiredisposalhq.com/api/get-all-drivers",
+          `https://portal.reliabletiredisposalhq.com/api/driver-orders/${DriverOrderId}`,
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -28,46 +26,53 @@ const SearchableSelect = () => {
           }
         );
         const result = response.data;
-
         if (result.status) {
           setOptions(result.data);
         } else {
-          console.error("Error fetching data:", result.message);
+          setError(result.message);
         }
       } catch (error) {
-        console.error("An error occurred while fetching data:", error);
+        setError("An error occurred while fetching data");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [authToken]);
-
-  const handleSendId = (id) => {
-    if (id) {
-      dispatch(setDriverOrderId(id));
-    }
-  };
+  }, [authToken, DriverOrderId]);
 
   return (
     <div>
       <Autocomplete
+        id="orderNumber"
         value={value}
         onChange={(event, newValue) => {
           setValue(newValue);
-          handleSendId(newValue?.id);
         }}
         options={options}
-        getOptionLabel={(option) => option.name}
+        getOptionLabel={(option) =>
+          `${DriverOrderId} - ${option.load_type} - ${option.customer.business_name}`
+        }
         isOptionEqualToValue={(option, value) => option.id === value.id}
         renderInput={(params) => (
-          <TextField {...params} label="Search and select Driver" variant="outlined" />
+          <TextField
+            {...params}
+            label="Search and Select Order No"
+            variant="outlined"
+            value={
+              value ? `${value.id} - ${value.load_type} - ${value.customer.business_name}` : ""
+            }
+          />
         )}
         loading={loading}
+        noOptionsText={error || "No matching orders"}
         renderOption={(props, option) => (
           <li {...props}>
-            <div>{option.name}</div>
+            <b>{DriverOrderId}</b>
+            <div style={{ marginLeft: "10px", marginRight: "10px" }}>
+              {option.customer.business_name}
+            </div>
+            <div>{option.load_type}</div>
           </li>
         )}
       />
@@ -75,4 +80,4 @@ const SearchableSelect = () => {
   );
 };
 
-export default SearchableSelect;
+export default SearchOrderNumber;
