@@ -45,13 +45,25 @@ export default function LoginPage() {
         email: email,
         password: password,
       });
+
       const result = response.data;
       if (result.status) {
-        toast.success(result.message);
-        const { token } = result;
-        dispatch(setToken(token));
-        localStorage.setItem("authToken", result.token);
-        navigate("/map-dashboard");
+        const { token, user } = result;
+        const userType = user.type;
+        console.log(userType, "userType");
+        if (userType === 0) {
+          toast.success("Welcome Admin! ");
+          dispatch(setToken(token));
+          localStorage.setItem("authToken", token);
+          navigate("/map-dashboard");
+        } else if (userType === 1) {
+          toast.success("Welcome Manager! ");
+          dispatch(setToken(token));
+          localStorage.setItem("authToken", token);
+          navigate("/map-dashboard");
+        } else {
+          toast.warn("Only admin or manager are allowed to log in.");
+        }
       } else {
         toast.error(result.message);
       }
