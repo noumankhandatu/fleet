@@ -6,13 +6,14 @@ import { useSelector } from "react-redux";
 import { selectDriverOrderId } from "../../toolkit/slices/DriverOrderId";
 
 const SearchOrderNumber = () => {
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState([]);
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const authToken = useSelector((state) => state.auth.token);
   const DriverOrderId = useSelector(selectDriverOrderId);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -44,6 +45,7 @@ const SearchOrderNumber = () => {
   return (
     <div>
       <Autocomplete
+        multiple  // Enable multiple selections
         id="orderNumber"
         value={value}
         onChange={(event, newValue) => {
@@ -59,9 +61,7 @@ const SearchOrderNumber = () => {
             {...params}
             label="Search and Select Order No"
             variant="outlined"
-            value={
-              value ? `${value.id} - ${value.load_type} - ${value.customer.business_name}` : ""
-            }
+            value={value.map((v) => `${v.id} - ${v.load_type} - ${v.customer.business_name}`).join(', ')}
           />
         )}
         loading={loading}
