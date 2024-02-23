@@ -10,7 +10,7 @@ const SearchableSelect = () => {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const authToken = useSelector((state) => state.auth.token);
+  const authToken = useSelector((state) => state?.auth.token);
 
   // hooks
   const dispatch = useDispatch();

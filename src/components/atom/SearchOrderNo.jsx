@@ -2,18 +2,22 @@ import { useState, useEffect } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectDriverOrderId } from "../../toolkit/slices/DriverOrderId";
+import { setOrderIds } from "../../toolkit/slices/routes/createRouteSlice";
 
 const SearchOrderNumber = () => {
+  // states
   const [value, setValue] = useState([]);
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  // redux
   const authToken = useSelector((state) => state.auth.token);
   const DriverOrderId = useSelector(selectDriverOrderId);
 
+  // hooks
+  const dispatch = useDispatch();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -42,10 +46,14 @@ const SearchOrderNumber = () => {
     fetchData();
   }, [authToken, DriverOrderId]);
 
+  useEffect(() => {
+    const orderIdsString = value.map((item) => item.id).join(",");
+    dispatch(setOrderIds(orderIdsString));
+  }, [dispatch, value]);
   return (
     <div>
       <Autocomplete
-        multiple  // Enable multiple selections
+        multiple
         id="orderNumber"
         value={value}
         onChange={(event, newValue) => {
@@ -61,13 +69,15 @@ const SearchOrderNumber = () => {
             {...params}
             label="Search and Select Order No"
             variant="outlined"
-            value={value.map((v) => `${v.id} - ${v.load_type} - ${v.customer.business_name}`).join(', ')}
+            value={value
+              .map((v) => `${v.id} - ${v.load_type} - ${v.customer.business_name}`)
+              .join(", ")}
           />
         )}
         loading={loading}
         noOptionsText={error || "No matching orders"}
         renderOption={(props, option) => (
-          <li {...props}>
+          <li key={option.id} {...props}>
             <b>{DriverOrderId}</b>
             <div style={{ marginLeft: "10px", marginRight: "10px" }}>
               {option.customer.business_name}

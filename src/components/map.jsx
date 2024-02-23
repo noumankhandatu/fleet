@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import { useEffect, useRef, useState } from "react";
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import { useJsApiLoader, GoogleMap, DirectionsRenderer } from "@react-google-maps/api";
 import Box from "@mui/system/Box";
 import RouteStopStatic from "./RouteStopStatic";
@@ -13,6 +13,10 @@ import { IconButton } from "@mui/material";
 import { MarkerF } from "@react-google-maps/api";
 import { center, directionOptions, googleMapsLibraries, myApiKey, styleBox } from "./utils";
 import { toast } from "react-toastify";
+import { selectOrderIds, setRouteName } from "../toolkit/slices/routes/createRouteSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectDriverOrderId } from "../toolkit/slices/DriverOrderId";
+import axios from "axios";
 
 let lable = "";
 let colorOne = "FF0000";
@@ -24,6 +28,7 @@ const AppMap = () => {
     libraries: googleMapsLibraries,
   });
 
+  // states
   const [stops, setStops] = useState([]);
   const [map, setMap] = useState(null);
   const [directionsResponse, setDirectionsResponse] = useState(null);
@@ -36,6 +41,13 @@ const AppMap = () => {
   const [placeIdLocations, setPlaceIdLocations] = useState();
   const [callCalulate, setCallCalulate] = useState(false);
   const [clickedMarkerIndex, setClickedMarkerIndex] = useState(null);
+  const [sendLocationToDriver, setsendLocationToDriver] = useState(false);
+  const [sendLocationLoader, setsendLocationLoader] = useState(false);
+  // hooks
+  const dispatch = useDispatch();
+  const driverIdRedux = useSelector(selectDriverOrderId);
+  const reduxOrderIds = useSelector(selectOrderIds);
+  const authToken = useSelector((state) => state?.auth.token);
 
   useEffect(() => {
     const fetchPlaceDetails = async () => {
@@ -102,6 +114,7 @@ const AppMap = () => {
     if (results.status === "OK" && results?.geocoded_waypoints) {
       setRoutesPlaceId(results?.geocoded_waypoints);
     }
+    setsendLocationToDriver(true);
 
     setDirectionsResponse(results);
     setDistance(results.routes[0].legs[0].distance.text);
@@ -169,6 +182,47 @@ const AppMap = () => {
       toast.success(`Swapped routes`);
     } else {
       setClickedMarkerIndex(index);
+    }
+  };
+  const handleSendToDriver = async () => {
+    try {
+      setsendLocationLoader(true);
+      const locationsString = [
+        originRef.current.value,
+        ...stops.map((stop) => stop.location),
+        destinationRef.current.value,
+      ].join(", ");
+
+      if (!locationsString) {
+        throw new Error("Locations string is empty");
+      }
+
+      setsendLocationToDriver(true);
+      dispatch(setRouteName(locationsString));
+
+      const formData = new FormData();
+      formData.append("order_ids", reduxOrderIds);
+      formData.append("route_name", locationsString);
+      formData.append("driver_id", driverIdRedux);
+
+      const response = await axios.post(
+        "https://portal.reliabletiredisposalhq.com/api/create-route",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "multipart/form-data",
+            // Add any additional headers if needed
+          },
+        }
+      );
+
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error("Error sending data to the server:", error);
+      // Handle error: display error message, log to analytics, etc.
+    } finally {
+      setsendLocationLoader(false);
     }
   };
   return (
@@ -258,6 +312,19 @@ const AppMap = () => {
           <Button onClick={calculateRoute} sx={{ ml: 1 }} variant="contained" color="primary">
             Create Route
           </Button>
+          {sendLocationLoader ? (
+            <CircularProgress color="warning" sx={{ ml: 3 }} />
+          ) : (
+            <Button
+              disabled={!sendLocationToDriver}
+              onClick={handleSendToDriver}
+              sx={{ ml: 1 }}
+              variant="contained"
+              color="warning"
+            >
+              Send to Driver
+            </Button>
+          )}
         </Box>
       </div>
       <div style={{ width: "70%", height: "100vh" }}>
