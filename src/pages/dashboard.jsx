@@ -33,7 +33,6 @@ const Dashboard = () => {
             },
           }
         );
-        console.log(response, "response");
         setAllRoutesData(response?.data?.data);
       } catch (error) {
         console.error("Error fetching all routes:", error);
@@ -92,7 +91,7 @@ const Dashboard = () => {
             label="Route Name"
             sx={{ width: "55%" }}
           />
-          <AppMap />
+          <AppMap setAllRoutesData={setAllRoutesData} />
           <Box>
             <Typography variant="h4">
               {" "}

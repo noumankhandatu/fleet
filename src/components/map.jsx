@@ -13,12 +13,8 @@ import { IconButton } from "@mui/material";
 import { MarkerF } from "@react-google-maps/api";
 import { center, directionOptions, googleMapsLibraries, myApiKey, styleBox } from "./utils";
 import { toast } from "react-toastify";
-import {
-  selectOrderIds,
-  selectRouteName,
-  setRouteName,
-} from "../toolkit/slices/routes/createRouteSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { selectOrderIds, selectRouteName } from "../toolkit/slices/routes/createRouteSlice";
+import { useSelector } from "react-redux";
 import { selectDriverOrderId } from "../toolkit/slices/DriverOrderId";
 import axios from "axios";
 
@@ -26,7 +22,7 @@ let lable = "";
 let colorOne = "FF0000";
 let colorTwo = "ADD8E6";
 
-const AppMap = () => {
+const AppMap = ({ setAllRoutesData }) => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: myApiKey,
     libraries: googleMapsLibraries,
@@ -45,6 +41,7 @@ const AppMap = () => {
   const [placeIdLocations, setPlaceIdLocations] = useState();
   const [callCalulate, setCallCalulate] = useState(false);
   const [clickedMarkerIndex, setClickedMarkerIndex] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [sendLocationToDriver, setsendLocationToDriver] = useState(true);
   const [sendLocationLoader, setsendLocationLoader] = useState(false);
   // hooks
@@ -209,8 +206,10 @@ const AppMap = () => {
           },
         }
       );
-
-      toast.success(response.data.message);
+      if (response.status === 200) {
+        setAllRoutesData((prev) => [...prev, response.data.data]);
+        toast.success(response.data.message);
+      }
     } catch (error) {
       console.error("Error sending data to the server:", error);
       // Handle error: display error message, log to analytics, etc.
