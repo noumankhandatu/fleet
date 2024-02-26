@@ -1,7 +1,7 @@
 import Box from "@mui/system/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
-import { Button, IconButton, Paper, TextField } from "@mui/material";
+import { IconButton, Paper, TextField } from "@mui/material";
 import AppMap from "./../components/map";
 import AppDrawer from "./../components/drawer";
 import SearchSelectDriver from "../components/atom/SearchSelectDriver";
@@ -81,17 +81,6 @@ const Dashboard = () => {
               </Typography>
               <Typography variant="caption">Route Name *</Typography>
             </Box>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "cennter",
-                justifyContent: "space-between",
-              }}
-            >
-              <Button variant="contained" color="primary">
-                Create Route
-              </Button>
-            </Box>
           </Box>
           <Box height="20px" />
           <SearchSelectDriver />
@@ -105,7 +94,11 @@ const Dashboard = () => {
           />
           <AppMap />
           <Box>
-            All Routes
+            <Typography variant="h4">
+              {" "}
+              <b>All Routes</b>{" "}
+            </Typography>
+
             {allRoutesData &&
               allRoutesData.map((route) => (
                 <Paper
