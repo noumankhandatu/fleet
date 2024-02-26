@@ -4,11 +4,11 @@ import Typography from "@mui/material/Typography";
 import { Button } from "@mui/material";
 import AppMap from "./../components/map";
 import AppDrawer from "./../components/drawer";
-import SearchableSelect from "../components/atom/SearchSelect";
+import SearchSelectDriver from "../components/atom/SearchSelectDriver";
 import SearchOrderNumber from "../components/atom/SearchOrderNo";
 import { useSelector } from "react-redux";
 import { selectDriverOrderId } from "../toolkit/slices/DriverOrderId";
-import AllRouteSearchableSelect from "../components/atom/SelectRoute";
+import SearchSelectRoute from "../components/atom/SearchSelectRoute";
 
 const Dashboard = () => {
   const Id = useSelector(selectDriverOrderId);
@@ -45,12 +45,11 @@ const Dashboard = () => {
             </Box>
           </Box>
           <Box height="40px" />
-          <AllRouteSearchableSelect />
+          <SearchSelectRoute />
           <Box height="20px" />
-          <SearchableSelect />
+          <SearchSelectDriver />
           <Box height="20px" />
           {Id && <SearchOrderNumber />}
-
           <AppMap />
         </Box>
       </Box>
