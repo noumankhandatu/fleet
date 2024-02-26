@@ -13,7 +13,11 @@ import { IconButton } from "@mui/material";
 import { MarkerF } from "@react-google-maps/api";
 import { center, directionOptions, googleMapsLibraries, myApiKey, styleBox } from "./utils";
 import { toast } from "react-toastify";
-import { selectOrderIds, setRouteName } from "../toolkit/slices/routes/createRouteSlice";
+import {
+  selectOrderIds,
+  selectRouteName,
+  setRouteName,
+} from "../toolkit/slices/routes/createRouteSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDriverOrderId } from "../toolkit/slices/DriverOrderId";
 import axios from "axios";
@@ -41,12 +45,13 @@ const AppMap = () => {
   const [placeIdLocations, setPlaceIdLocations] = useState();
   const [callCalulate, setCallCalulate] = useState(false);
   const [clickedMarkerIndex, setClickedMarkerIndex] = useState(null);
-  const [sendLocationToDriver, setsendLocationToDriver] = useState(false);
+  const [sendLocationToDriver, setsendLocationToDriver] = useState(true);
   const [sendLocationLoader, setsendLocationLoader] = useState(false);
   // hooks
-  const dispatch = useDispatch();
   const driverIdRedux = useSelector(selectDriverOrderId);
   const reduxOrderIds = useSelector(selectOrderIds);
+  const reduxRouteName = useSelector(selectRouteName);
+
   const authToken = useSelector((state) => state?.auth.token);
 
   useEffect(() => {
@@ -114,8 +119,6 @@ const AppMap = () => {
     if (results.status === "OK" && results?.geocoded_waypoints) {
       setRoutesPlaceId(results?.geocoded_waypoints);
     }
-    setsendLocationToDriver(true);
-
     setDirectionsResponse(results);
     setDistance(results.routes[0].legs[0].distance.text);
     setDuration(results.routes[0].legs[0].duration.text);
@@ -187,22 +190,12 @@ const AppMap = () => {
   const handleSendToDriver = async () => {
     try {
       setsendLocationLoader(true);
-      const locationsString = [
-        originRef.current.value,
-        ...stops.map((stop) => stop.location),
-        destinationRef.current.value,
-      ].join(", ");
-
-      if (!locationsString) {
-        throw new Error("Locations string is empty");
-      }
-
-      setsendLocationToDriver(true);
-      dispatch(setRouteName(locationsString));
-
       const formData = new FormData();
+      if (!reduxOrderIds || !reduxRouteName || !driverIdRedux) {
+        return toast.warn("please select order id , driver id and route name");
+      }
       formData.append("order_ids", reduxOrderIds);
-      formData.append("route_name", locationsString);
+      formData.append("route_name", reduxRouteName);
       formData.append("driver_id", driverIdRedux);
 
       const response = await axios.post(
