@@ -238,26 +238,26 @@ const AppMap = () => {
           return (
             <div key={index}>
               <Grid key={index} container spacing={4} sx={{ alignItems: "end" }}>
-                <Grid style={{ textAlign: "center" }} xs={2}>
-                  Stop {index + 1}
-                </Grid>
-                <Grid xs={3}>
-                  <Box sx={styleBox}>
-                    <Autocomplete
-                      onLoad={(auto) => setAutocomplete(auto)}
-                      onPlaceChanged={() => handlePlaceChanged(index)}
-                    >
-                      <TextField
-                        label={`Stop ${index + 1} Location`}
-                        value={stop.location}
-                        onChange={(e) => {
-                          const updatedStops = [...stops];
-                          updatedStops[index].location = e.target.value;
-                          setStops(updatedStops);
-                        }}
-                      />
-                    </Autocomplete>
-                  </Box>
+                <Grid xs={4}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <p style={{ marginRight: 10, marginTop: 20 }}>Stop{index + 1}</p>
+                    <Box sx={styleBox}>
+                      <Autocomplete
+                        onLoad={(auto) => setAutocomplete(auto)}
+                        onPlaceChanged={() => handlePlaceChanged(index)}
+                      >
+                        <TextField
+                          label={`Stop ${index + 1} Location`}
+                          value={stop.location}
+                          onChange={(e) => {
+                            const updatedStops = [...stops];
+                            updatedStops[index].location = e.target.value;
+                            setStops(updatedStops);
+                          }}
+                        />
+                      </Autocomplete>
+                    </Box>
+                  </div>
                 </Grid>
                 <Grid xs={3}>
                   <Box sx={styleBox}>

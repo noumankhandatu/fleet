@@ -11,6 +11,7 @@ import { selectDriverOrderId } from "../toolkit/slices/DriverOrderId";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AllRouteSearchableSelect from "../components/atom/SelectRoute";
 
 const Dashboard = () => {
   const authToken = useSelector((state) => state.auth.token);
@@ -28,7 +29,6 @@ const Dashboard = () => {
             },
           }
         );
-        console.log(response, "response");
         setAllRoutesData(response?.data?.data);
       } catch (error) {
         console.error("Error fetching all routes:", error);
@@ -82,15 +82,17 @@ const Dashboard = () => {
               </Button>
             </Box>
           </Box>
+          <Box height="40px" />
+          <AllRouteSearchableSelect />
           <Box height="20px" />
           <SearchableSelect />
           <Box height="20px" />
           {Id && <SearchOrderNumber />}
-          <Box height="40px" />
+
           <AppMap />
         </Box>
       </Box>
-      <Box sx={{ ml: 35 }}>
+      {/* <Box sx={{ ml: 35 }}>
         All Routes
         {allRoutesData &&
           allRoutesData.map((route) => (
@@ -105,7 +107,7 @@ const Dashboard = () => {
               </IconButton>
             </Paper>
           ))}
-      </Box>
+      </Box> */}
     </div>
   );
 };
